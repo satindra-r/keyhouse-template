@@ -1,8 +1,8 @@
 name: Build and Deploy
 on:
   push:
-    branches:
-      - master
+    branches-ignore:
+      - build
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -10,10 +10,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
 
-    - name: Build and Deploy
-      uses: JamesIves/github-pages-deploy-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: build
-        FOLDER: api
-        BUILD_SCRIPT: python3 build.py
+    - name: Build
+      run: |
+        python3 build.py
+
+    - name: Deploy
+      if: github.ref == 'refs/heads/master'
+      uses: JamesIves/github-pages-deploy-action@4.0.0
+      with:
+        branch: build
+        folder: api
